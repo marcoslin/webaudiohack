@@ -26,7 +26,7 @@ After cloning this project, do:
 
 1. `npm install`
 1. `node server.js`
-1. Open http://localhost:8080 using Chrome
+1. Open http://localhost:8080/ using Chrome
 
 Note
 ============
