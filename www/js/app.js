@@ -20,7 +20,8 @@ var context = new AudioContext();
 var audioBuffer;
 var sourceNode;
 
-var volume_meter = document.getElementById("volume_meter"),
+var volume_meter_L = document.getElementById("volume_meter_L"),
+    volume_meter_R = document.getElementById("volume_meter_R"),
     dataout = document.getElementById("dataout"),
     audio = document.getElementById("audio");
 
@@ -36,101 +37,75 @@ function setupAudioNodes() {
  
     // setup a javascript node
     javascriptNode = context.createScriptProcessor(2048, 1, 1);
-    
-    
-    
-    javascriptNode.onaudioprocess = function() {
- 
-        // get the average for the first channel
-        var array =  new Uint8Array(analyser.frequencyBinCount);
-        analyser.getByteFrequencyData(array);
-        var average = getAverageVolume(array);
-    
-        // get the average for the second channel
-        //var array2 =  new Uint8Array(analyser2.frequencyBinCount);
-        //analyser2.getByteFrequencyData(array2);
-        //var average2 = getAverageVolume(array2);
-    
-        //console.log("array: ", array);
-        volume_meter.style.width = average;
-        dataout.innerHTML = average;
-        
-    }
-    
-    
-    
     // connect to destination, else it isn't called
     javascriptNode.connect(context.destination);
 
     // setup a analyzer
-    analyser = context.createAnalyser();
-    analyser.smoothingTimeConstant = 0.3;
-    analyser.fftSize = 1024;
+    var analyser_left = context.createAnalyser();
+    analyser_left.smoothingTimeConstant = 0.3;
+    analyser_left.fftSize = 1024;
+
+    var analyser_right = context.createAnalyser();
+    analyser_right.smoothingTimeConstant = 0.3;
+    analyser_right.fftSize = 1024;
 
     // create a buffer source node
-    // sourceNode = context.createBufferSource();
+    splitter = context.createChannelSplitter();
 
-    // connect the source to the analyser
-    sourceNode.connect(analyser);
+    // connect the source to the analyser and the splitter
+    sourceNode.connect(splitter);
 
-    // we use the javascript node to draw at a specific interval.
-    analyser.connect(javascriptNode);
+    // connect one of the outputs from the splitter to
+    // the analyser.  Channel 0 is LEFT and channel 1 is Right
+    // http://www.w3.org/TR/webaudio/#ChannelSplitterNode-section
+    splitter.connect(analyser_left,0,0);
+    splitter.connect(analyser_right,1,0);
 
-    // and connect to destination, if you want audio
-   // sourceNode.connect(context.destination);
-}
-
-
-// load the specified sound
-function loadSound(url) {
-    var request = new XMLHttpRequest();
-    request.open('GET', url, true);
-    request.responseType = 'arraybuffer';
-
-    // When loaded decode the data
-    request.onload = function() {
-
-        // decode the data
-        context.decodeAudioData(request.response, function(buffer) {
-            // when the audio is decoded play the sound
-            playSound(buffer);
-        }, onError);
+    // we use the javascript node to draw at a
+    // specific interval.
+    analyser_left.connect(javascriptNode);
+    
+    
+    javascriptNode.onaudioprocess = function() {
+ 
+       // get the average for the first channel
+        var array_left =  new Uint8Array(analyser_left.frequencyBinCount);
+        analyser_left.getByteFrequencyData(array_left);
+        var average_left = getAverageVolume(array_left);
+ 
+        // get the average for the second channel
+        var array_right =  new Uint8Array(analyser_right.frequencyBinCount);
+        analyser_right.getByteFrequencyData(array_right);
+        var average_right = getAverageVolume(array_right);
+        
+        //console.log("array: ", array);
+        volume_meter_L.style.width = average_left;
+        volume_meter_R.style.width = average_right;
+        dataout.innerHTML = average + "/" + average2;
+        
     }
-    request.send();
+    
 }
 
-
-
-
-function playSound(buffer) {
-    sourceNode.buffer = buffer;
-    sourceNode.start(0);
-}
-
-// log if an error occurs
-function onError(e) {
-    console.log(e);
-}
 
 
 
 function getAverageVolume(array) {
-        var values = 0;
-        var average;
- 
-        var length = array.length;
- 
-        // get all the frequency amplitudes
-        for (var i = 0; i < length; i++) {
-            values += array[i];
-        }
- 
-        average = values / length;
-    
-        // return average;
-    
-        return Math.round(average);
+    var values = 0;
+    var average;
+
+    var length = array.length;
+
+    // get all the frequency amplitudes
+    for (var i = 0; i < length; i++) {
+        values += array[i];
     }
+
+    average = values / length;
+
+    // return average;
+    return Math.round(average);
+}
 
 
 
