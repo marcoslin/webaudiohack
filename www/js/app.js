@@ -25,6 +25,10 @@ var volume_meter_L = document.getElementById("volume_meter_L"),
     dataout = document.getElementById("dataout"),
     audio = document.getElementById("audio");
 
+var socket = io.connect(document.location);
+socket.on("connect", function (data) {
+    socket.send("Web Started");
+});
 
 window.addEventListener('load', function(e) {
     sourceNode = context.createMediaElementSource(audio);
@@ -81,7 +85,9 @@ function setupAudioNodes() {
         //console.log("array: ", array);
         volume_meter_L.style.width = average_left;
         volume_meter_R.style.width = average_right;
-        dataout.innerHTML = average + "/" + average2;
+        dataout.innerHTML = average_left + "/" + average_right;
+        
+        socket.emit("sound_data", { "left": average_left, "right": average_right });
         
     }
     
@@ -106,6 +112,8 @@ function getAverageVolume(array) {
     // return average;
     return Math.round(average);
 }
+
+
 
 
 
