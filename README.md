@@ -8,12 +8,13 @@ here is the cleaned up version of JavaScript code that:
 2. Create a volume percentage number
 3. Display this volume in a progress bar on a webpage
 4. Send this volume info to a server
+5. Visualize the volume info on server
 
 Implementation
 ============
 
 The objective here is to use pure Javascript on a HTML5 browser without any 3rd party libraries.
-The code is also kept as simple as possible, concentrating to deliver the object set above.
+The code is also kept as simple as possible, concentrating on delivering the objectives set above.
 
 The audio is loaded using `<audio>` HTML5 tag and volume meter is based on a simple `<div>`.
 Communication between web client and server is based on [`socket.io`](http://socket.io/).  On
