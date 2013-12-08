@@ -27,3 +27,16 @@ After cloning this project, do:
 1. `npm install`
 1. `node server.js`
 
+Note
+============
+
+* This code only works on Google Chrome.  It won't work on Firefox due to the use a `.mp3` file
+* If audio does not load, try to login to Deezer.com or substitude the audio source to a local
+mp3 file.
+
+Reference
+============
+
+* [Exploring the HTML5 Web Audio: visualizing sound ](http://www.smartjava.org/content/exploring-html5-web-audio-visualizing-sound)
+* [HTML5 <audio> and the Web Audio API are BFFs!](http://updates.html5rocks.com/2012/02/HTML5-audio-and-the-Web-Audio-API-are-BFFs)
+
