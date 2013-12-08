@@ -1,13 +1,8 @@
 /*
-
 Reference:
-
 * http://updates.html5rocks.com/2012/02/HTML5-audio-and-the-Web-Audio-API-are-BFFs
 * http://www.smartjava.org/content/exploring-html5-web-audio-visualizing-sound
-
 */
-
-
 
 // check if the default naming is enabled, if not use the chrome one.
 if (! window.AudioContext) {
@@ -17,28 +12,32 @@ if (! window.AudioContext) {
     window.AudioContext = window.webkitAudioContext;
 }
 var context = new AudioContext();
-var audioBuffer;
-var sourceNode;
 
+// Obtain reference to HTML elements needed and create a socket connection to server
 var volume_meter_L = document.getElementById("volume_meter_L"),
     volume_meter_R = document.getElementById("volume_meter_R"),
-    dataout = document.getElementById("dataout"),
-    audio = document.getElementById("audio");
+    audio = document.getElementById("audio"),
+    socket = io.connect(document.location);
 
-var socket = io.connect(document.location);
-socket.on("connect", function (data) {
-    socket.send("Web Started");
-});
 
+
+// Start processing audio info after load event
 window.addEventListener('load', function(e) {
-    sourceNode = context.createMediaElementSource(audio);
-    sourceNode.connect(context.destination);
     setupAudioNodes();
 }, false);
 
+
+
+
+
+
+// Core section of the code to process audio
 var javascriptNode;
 function setupAudioNodes() {
- 
+    // Get the source from the audio tag
+    var sourceNode = context.createMediaElementSource(audio);
+    sourceNode.connect(context.destination);
+    
     // setup a javascript node
     javascriptNode = context.createScriptProcessor(2048, 1, 1);
     // connect to destination, else it isn't called
@@ -69,7 +68,6 @@ function setupAudioNodes() {
     // specific interval.
     analyser_left.connect(javascriptNode);
     
-    
     javascriptNode.onaudioprocess = function() {
  
        // get the average for the first channel
@@ -82,42 +80,35 @@ function setupAudioNodes() {
         analyser_right.getByteFrequencyData(array_right);
         var average_right = getAverageVolume(array_right);
         
-        //console.log("array: ", array);
-        volume_meter_L.style.width = average_left;
-        volume_meter_R.style.width = average_right;
-        dataout.innerHTML = average_left + "/" + average_right;
+        // As volume_meter is 300px, the width is therefore percent * 3
+        volume_meter_L.style.width = average_left * 3;
+        volume_meter_L.innerHTML = average_left;
+        volume_meter_R.style.width = average_right * 3;
+        volume_meter_R.innerHTML = average_right;
         
-        socket.emit("sound_data", { "left": average_left, "right": average_right });
+        // Send volume into to server
+        socket.emit("volume_info", { "left": average_left, "right": average_right });
         
     }
     
 }
 
-
-
-
+// Return a average volume in percent
 function getAverageVolume(array) {
-    var values = 0;
-    var average;
+    var values = 0,
+        length = array.length;
 
-    var length = array.length;
-
-    // get all the frequency amplitudes
+    // get average for all the frequency amplitudes
     for (var i = 0; i < length; i++) {
         values += array[i];
     }
+    var average = values / length;
 
-    average = values / length;
-
-    // return average;
-    return Math.round(average);
+    // Result from getByteFrequencyData is 0 to 255
+    // http://stackoverflow.com/questions/14789283/what-does-the-fft-data-in-the-web-audio-api-correspond-to
+    var average_percent = (average / 255) * 100;
+    // return average_percent;
+    return Math.round(average_percent);
 }
-
-
-
-
-
-
-
 
 
