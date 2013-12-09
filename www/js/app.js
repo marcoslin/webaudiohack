@@ -68,6 +68,7 @@ function setupAudioNodes() {
     // specific interval.
     analyser_left.connect(javascriptNode);
     
+    var prev_average_LR = {"left": 0, "right": 0};
     javascriptNode.onaudioprocess = function() {
  
        // get the average for the first channel
@@ -86,9 +87,14 @@ function setupAudioNodes() {
         volume_meter_R.style.width = average_right * 3;
         volume_meter_R.innerHTML = average_right;
         
-        // Send volume into to server
-        socket.emit("volume_info", { "left": average_left, "right": average_right });
-        
+        // When the music is not playing, an average of Zero is continuesly being generated.
+        // Using prev_average_LR to detect the repeated zero value
+        var average_LR = { "left": average_left, "right": average_right };
+        if (average_LR.left !== prev_average_LR.left && average_LR.right !== prev_average_LR.right) {
+            // Send volume into to server
+            socket.emit("volume_info", average_LR);
+        }
+        prev_average_LR = average_LR;
     }
     
 }
