@@ -1,18 +1,36 @@
 #!/usr/bin/env node
 
+// Configure Express Web Server
 var express = require("express"),
     app = express(),
-    http_port = 8080,
+    proxy = require(__dirname + "/proxy.js")();
+
+app.use(express.static(__dirname + '/www'));
+app.get("/proxy", function (req, res) {
+    if ( "url" in req.query ) {
+        proxy.request(req.query.url, req, res);
+    } else {
+        res.status(500).send("Error: Expected url query string not provided.");
+    }
+});
+
+// Start Express Web Server and setup SocketIO
+var http_port = 8080,
     server = app.listen(http_port),
     io = require("socket.io").listen(server, { log: false }),
     multimeter = require('multimeter'),
     multi = multimeter(process);
 
-app.use(express.static(__dirname + '/www'));
+io.on("connection", function (socket) {
+    socket.on("volume_info", function (data) {
+        left_bar.percent(data.left);
+        right_bar.percent(data.right);
+    });
+});
 
 
 // Initialize Volume Meter
-multi.write("Open in Chrome: http://localhost:" + http_port + "/\n\n");
+multi.write("Open in Chrome or Firefox: http://localhost:" + http_port + "/\n\n");
 multi.write("Volume Meter:\n\n");
     
 multi.write("Left:\n");
@@ -25,11 +43,4 @@ right_bar.percent(0);
 
 multi.offset += 1; 
 
-// Listen to socket io messages
-io.on("connection", function (socket) {
-    socket.on("volume_info", function (data) {
-        left_bar.percent(data.left);
-        right_bar.percent(data.right);
-    });
-});
 

@@ -27,13 +27,16 @@ After cloning this project, do:
 
 1. `npm install`
 1. `node server.js`
-1. Open http://localhost:8080/ using Chrome
+1. Open [http://localhost:8080/](http://localhost:8080/) using latest version of Chrome or Firefox
 
 Note
 ============
 
-* This code only works on Google Chrome.  WebAudio API does not seems to be working in Firefox.
-  See [this question](http://stackoverflow.com/questions/20469190/createmediaelementsource-method-of-web-audio-api-in-firefox) on Stackoverflow.
+* `proxy.js` has been created to make this work in Firefox. See 
+  [this question](http://stackoverflow.com/questions/20469190/createmediaelementsource-method-of-web-audio-api-in-firefox)
+  on Stackoverflow for more detail.
+* Firefox 25.0.1 has a bug that when an HTML5 audio is interecepted, the sound progress does not work.  It will stay at
+  initial position and jump directly to the end when sound is over.
 
 Reference
 ============
