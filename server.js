@@ -12,6 +12,7 @@ app.use(express.static(__dirname + '/www'));
 
 
 // Initialize Volume Meter
+multi.write("Open in Chrome: http://localhost:" + http_port + "/\n\n");
 multi.write("Volume Meter:\n\n");
     
 multi.write("Left:\n");

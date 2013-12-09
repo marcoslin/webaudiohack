@@ -31,9 +31,8 @@ After cloning this project, do:
 Note
 ============
 
-* This code only works on Google Chrome.  It won't work on Firefox due to the use a `.mp3` file
-* If audio does not load, try to login to Deezer.com or substitude the audio source to a local
-mp3 file.
+* This code only works on Google Chrome.  WebAudio API does not seems to be working in Firefox.
+  See [this question](http://stackoverflow.com/questions/20469190/createmediaelementsource-method-of-web-audio-api-in-firefox) on Stackoverflow.
 
 Reference
 ============
