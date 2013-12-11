@@ -1,3 +1,8 @@
+#error_status {
+    padding-top: 10px;
+    color: red;
+}
+
 .volume_meter_box {
     border-style: solid;
     border-width: 2px;
@@ -10,3 +15,4 @@
     height: 20px;
     background-color: red;
 }
+

@@ -17,12 +17,14 @@ app.get("/proxy", function (req, res) {
 // Start Express Web Server and setup SocketIO
 var http_port = 8080,
     server = app.listen(http_port),
-    io = require("socket.io").listen(server, { log: false }),
+    ws = require('ws').Server,
+    io = new ws({server: server}),
     multimeter = require('multimeter'),
     multi = multimeter(process);
 
 io.on("connection", function (socket) {
-    socket.on("volume_info", function (data) {
+    socket.on("message", function (json_string, flags) {
+        var data = JSON.parse(json_string);
         left_bar.percent(data.left);
         right_bar.percent(data.right);
     });
