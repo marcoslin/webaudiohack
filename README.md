@@ -17,7 +17,7 @@ The objective here is to use pure Javascript on a HTML5 browser without any 3rd 
 The code is also kept as simple as possible, concentrating on delivering the objectives set above.
 
 The audio is loaded using `<audio>` HTML5 tag and volume meter is based on a simple `<div>`.
-Communication between web client and server is based on [`socket.io`](http://socket.io/).  On
+Communication between web client and server is based on `Websocket`.  On
 the server side [`node-multimeter`](https://github.com/substack/node-multimeter) is used to generate the volume meter on the console.
 
 Usage
